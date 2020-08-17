@@ -20,22 +20,22 @@ function makeLeftMessage(user: string): LeftMessage {
   return { user, type: 'LEFT' }
 }
 
-export interface JSONMessage {
-  type: 'MESSAGE',
+export interface CommMessage {
+  type: 'COMM',
   user: string,
   msg: any,
   // maybe we got a message incorrectly formatted as something other than JSON:
   msgFailedParse?: boolean,
 }
-function makeJSONMessage(user: string, json: string): JSONMessage {
+function makeCommMessage(user: string, json: string): CommMessage {
   let msg
   try {
     msg = JSON.parse(json)
   } catch (error) {
     log.warn("makeJSONMessage - error parsing message JSON", { error })
-    return { user, msg: json, type: 'MESSAGE', msgFailedParse: true }
+    return { user, msg: json, type: 'COMM', msgFailedParse: true }
   }
-  return { user, msg, type: 'MESSAGE' }
+  return { user, msg, type: 'COMM' }
 }
 
 export interface UnknownMessage {
@@ -48,9 +48,9 @@ function makeUnknownMessage(data: string): UnknownMessage {
 
 const joinedFormat = /^(.+) joined (.+)$/
 const leftFormat = /^(.+) left the room$/
-const messageFormat = /^(.+): (.+)$/
+const commFormat = /^(.+): (.+)$/
 
-export function parseMessageData(data: string): JoinedMessage | LeftMessage | JSONMessage | UnknownMessage {
+export function parseMessageData(data: string): JoinedMessage | LeftMessage | CommMessage | UnknownMessage {
   if (joinedFormat.test(data)) {
     const [ user ] = joinedFormat.exec(data)?.slice(1) || []
     return makeJoinedMessage(user)
@@ -61,9 +61,9 @@ export function parseMessageData(data: string): JoinedMessage | LeftMessage | JS
     return makeLeftMessage(user)
   }
 
-  if (messageFormat.test(data)) {
-    const [ user, json ] = messageFormat.exec(data)?.slice(1) || []
-    return makeJSONMessage(user, json)
+  if (commFormat.test(data)) {
+    const [ user, json ] = commFormat.exec(data)?.slice(1) || []
+    return makeCommMessage(user, json)
   }
 
   return makeUnknownMessage(data)
