@@ -5,19 +5,22 @@ import { logger } from '../logger'
 const log = logger('components/UserRoom')
 
 interface Props {
-  user: string,
-  room: string
+  id: string
 }
 
-export function UserRoom({ user, room }: Props) {
+export function UserRoom({ id }: Props) {
   const { userRoomManager } = useContext(AppContext)
 
-  const userRoom = userRoomManager.getRoom({ user, room })
-  log.debug({ userRoom })
+  const userRoom = userRoomManager.getRoom(id)
+  log.info({ userRoom })
 
-  return (
-    <div>
-      {user}, {room}
-    </div>
-  )
+  if (userRoom) {
+    return (
+      <div>
+        {userRoom.user}, {userRoom.room}
+      </div>
+    )
+  }
+
+  return <div>No user room with id = <pre>{id}</pre></div>
 }

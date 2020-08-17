@@ -8,18 +8,18 @@ export type MessageType = 'OPEN' | 'MESSAGE' | 'CLOSE' | 'ERROR'
 
 export class ObservableWebSocket {
   ws: WebSocket
-  incoming$: Observable<Event>
+  incoming$: Observable<MessageEvent>
   outgoing$: Subject<any> = new Subject()
   incoming$subscription: Subscription
 
   constructor(url: string) {
     this.ws = new WebSocket(url)
-    this.incoming$ = fromEvent(this.ws, 'message')
+    this.incoming$ = fromEvent<MessageEvent>(this.ws, 'message')
 
     this.incoming$subscription = this.incoming$.pipe(
-      map((event: Event) => event)
+      map((event: MessageEvent) => event.data)
     ).subscribe((msg: any) => {
-      console.log('incoming msg', { msg })
+      log.info('incoming msg', { msg })
     })
 
     this.outgoing$.pipe(
@@ -30,15 +30,15 @@ export class ObservableWebSocket {
 
     // @TODO: buffer outgoing messages until connection is open
     this.ws.onopen = (evt: Event) => {
-      log.debug('ws open', { url, evt })
+      log.info('ws open', { url, evt })
     }
 
     this.ws.onclose = (evt: Event) => {
-      log.debug('ws close', { url, evt })
+      log.info('ws close', { url, evt })
     }
 
     this.ws.onerror = (evt: Event) => {
-      log.debug('ws error', { url, evt })
+      log.error('ws error', { url, evt })
     }
   }
 

@@ -1,38 +1,41 @@
 import { BehaviorSubject } from 'rxjs'
-import { UserRoomService, UserRoom, getId, fromId } from './user-room'
+import { UserRoomService, UserRoom, getId } from './user-room'
 
 export class UserRoomManager {
   userRoomById: Map<string, UserRoomService> = new Map()
-  rooms$: BehaviorSubject<UserRoom[]> = new BehaviorSubject<UserRoom[]>([])
+  rooms$: BehaviorSubject<UserRoomService[]> = new BehaviorSubject<UserRoomService[]>([])
 
   addRoom(userRoom: UserRoom): UserRoomService {
-    let service: UserRoomService | null = this.getRoom(userRoom)
+    const id = getId(userRoom)
+    let service = this.getRoom(id)
     if (service) {
       return service
     }
 
     service = new UserRoomService(userRoom)
-    const id = getId(userRoom)
-    this.userRoomById.set(id, service)
-    this.rooms$.next(Array.from(this.userRoomById.keys()).map(fromId))
+    this.userRoomById.set(service.id, service)
+    this._publishUserRooms()
 
     return service
   }
 
-  getRoom(userRoom: UserRoom): UserRoomService | null {
-    const id = getId(userRoom)
-    return this.userRoomById.get(id) || null
+  getRoom(userRoomId: string): UserRoomService | null {
+    return this.userRoomById.get(userRoomId) || null
   }
 
-  removeRoom(userRoom: UserRoom): UserRoomService | null {
-    const id = getId(userRoom)
-    const service = this.userRoomById.get(id) || null
+  removeRoom(userRoomId: string): UserRoomService | null {
+    const service = this.getRoom(userRoomId)
+
     if (service) {
-      this.userRoomById.delete(id)
+      this.userRoomById.delete(userRoomId)
       service.destroy()
-      this.rooms$.next(Array.from(this.userRoomById.keys()).map(fromId))
+      this._publishUserRooms()
     }
 
     return service
+  }
+
+  _publishUserRooms = () => {
+    this.rooms$.next(Array.from(this.userRoomById.values()))
   }
 }
