@@ -1,4 +1,6 @@
+import { map } from 'rxjs/operators'
 import { ObservableWebSocket } from '../util/observable-websocket'
+import { parseMessageData } from '../messages/messages'
 import { config } from '../config'
 
 export interface UserRoom {
@@ -29,6 +31,10 @@ export class UserRoomService {
     this.room = room
 
     this.ws = new ObservableWebSocket(url)
+
+    this.ws.incoming$.pipe(
+      map((event: MessageEvent) => parseMessageData(event.data))
+    )
   }
 
   destroy() {
