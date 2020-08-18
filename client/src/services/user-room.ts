@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ObservableWebSocket } from '../util/observable-websocket'
-import { parseMessageData, Message } from '../messages/messages'
+import { Message } from '../message/message'
+import { parseMessageData } from '../message/parsers/oatpp-ws-messages'
 import { config } from '../config'
 
 export interface UserRoom {

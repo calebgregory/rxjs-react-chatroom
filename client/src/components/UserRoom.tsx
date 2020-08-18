@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSubscription } from 'observable-hooks'
-import { Message } from '../messages/messages'
+import { Message } from '../message/message'
 import { UserRoomService } from '../services/user-room'
 
 interface Props {
