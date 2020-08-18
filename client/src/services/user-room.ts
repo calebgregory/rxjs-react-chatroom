@@ -1,6 +1,7 @@
+import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ObservableWebSocket } from '../util/observable-websocket'
-import { parseMessageData } from '../messages/messages'
+import { parseMessageData, Message } from '../messages/messages'
 import { config } from '../config'
 
 export interface UserRoom {
@@ -22,6 +23,7 @@ export class UserRoomService {
   user: string
   room: string
   ws: ObservableWebSocket
+  incoming$: Observable<Message>
 
   constructor({ user, room }: UserRoom) {
     const url = `${config.wsUrl}/${room}/?nickname=${user}`
@@ -32,9 +34,14 @@ export class UserRoomService {
 
     this.ws = new ObservableWebSocket(url)
 
-    this.ws.incoming$.pipe(
+    this.incoming$ = this.ws.incoming$.pipe(
       map((event: MessageEvent) => parseMessageData(event.data))
     )
+  }
+
+  send(text: string, type: string = 'Full Message') {
+    const msg = { time: Date.now(), text, type }
+    this.ws.send(msg)
   }
 
   destroy() {
