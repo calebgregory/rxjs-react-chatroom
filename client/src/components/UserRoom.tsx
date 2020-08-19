@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { useSubscription } from 'observable-hooks'
+import React, { useRef, useState, ChangeEvent } from 'react'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { useSubscription, useObservableState } from 'observable-hooks'
 import { Message } from '../message/message'
 import { UserRoomService } from '../services/user-room'
 
@@ -8,13 +10,23 @@ interface Props {
 }
 
 export function UserRoom({ service }: Props) {
+  const formRef = useRef<HTMLFormElement>(null)
   const [ messages, setMessages ] = useState<Message[]>([])
-  const [input, setInput] = useState<string>('')
+  const [input, onChange] = useObservableState(
+    (evt$: Observable<ChangeEvent<HTMLInputElement> | string>) => (
+      evt$.pipe(
+        map((evt) => typeof evt === 'string' ?
+          evt :
+          (evt.target as HTMLInputElement).value)
+      )
+    ),
+    ''
+  )
   const handleSubmit = (evt: React.SyntheticEvent) => {
     evt.preventDefault()
 
     service.send(input)
-    setInput('')
+    onChange('')
   }
 
   useSubscription(service.incoming$, (message) => setMessages([...messages, message]))
@@ -37,10 +49,10 @@ export function UserRoom({ service }: Props) {
           }
         })}
         <li>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} ref={formRef}>
             &gt;
             {' '}
-            <input type="text" onChange={(evt) => { setInput(evt.target.value) }} value={input} />
+            <input type="text" onChange={onChange} value={input} />
             <span style={{fontSize: 10, marginLeft: '5px'}}><i><code>Enter</code> key sends</i></span>
           </form>
         </li>
