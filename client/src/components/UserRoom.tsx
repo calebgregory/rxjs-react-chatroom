@@ -1,16 +1,20 @@
-import React, { useRef, useState, ChangeEvent } from 'react'
+import React, { useRef, useState, ChangeEvent, useEffect } from 'react'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { useSubscription, useObservableState } from 'observable-hooks'
-import { Message } from '../message/message'
+import { useSubscription, useObservable, useObservableState } from 'observable-hooks'
+import { Message, ProgressMessage, CompleteMessage } from '../message/message'
 import { UserRoomService } from '../services/user-room'
 
 interface Props {
   service: UserRoomService
 }
 
+const makeId = () => `msg-${Date.now()}-${Math.random().toPrecision(7)}`
+
 export function UserRoom({ service }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
+
+  const [id, setId] = useState<string>(makeId())
   const [ messages, setMessages ] = useState<Message[]>([])
   const [input, onChange] = useObservableState(
     (evt$: Observable<ChangeEvent<HTMLInputElement> | string>) => (
@@ -22,14 +26,29 @@ export function UserRoom({ service }: Props) {
     ),
     ''
   )
+
+  const progress$ = useObservable(
+    (input$) => input$.pipe(
+      map(([text]) => ({ type: 'PROGRESS', text, time: Date.now(), id, } as ProgressMessage))
+    ),
+    [input]
+  )
+
   const handleSubmit = (evt: React.SyntheticEvent) => {
     evt.preventDefault()
 
-    service.send(input)
+    const msg: CompleteMessage = { type: 'COMPLETE', text: input, time: Date.now(), id }
+    service.send(msg)
     onChange('')
+    setId(makeId())
   }
 
   useSubscription(service.incoming$, (message) => setMessages([...messages, message]))
+  useEffect(() => {
+    // pipe PROGRESS messages -> outgoing$ Subject on Service
+    const subscription = progress$.subscribe(service.outgoing$)
+    return () => { subscription.unsubscribe() }
+  }, [progress$, service.outgoing$])
 
   return (
     <div>

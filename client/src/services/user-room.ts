@@ -1,7 +1,7 @@
-import { Observable } from 'rxjs'
+import { Observable, Subject, Subscription } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ObservableWebSocket } from '../util/observable-websocket'
-import { Message } from '../message/message'
+import { Message, ProgressMessage, CompleteMessage } from '../message/message'
 import { parseMessageData } from '../message/parsers/oatpp-ws-messages'
 import { config } from '../config'
 
@@ -25,6 +25,8 @@ export class UserRoomService {
   room: string
   ws: ObservableWebSocket
   incoming$: Observable<Message>
+  outgoing$: Subject<ProgressMessage | CompleteMessage> = new Subject()
+  $subscriptions: Set<Subscription> = new Set()
 
   constructor({ user, room }: UserRoom) {
     const url = `${config.wsUrl}/${room}/?nickname=${user}`
@@ -38,14 +40,16 @@ export class UserRoomService {
     this.incoming$ = this.ws.incoming$.pipe(
       map((event: MessageEvent) => parseMessageData(event.data))
     )
+
+    this.$subscriptions.add(this.outgoing$.subscribe((msg) => this.send(msg)))
   }
 
-  send(text: string, type: string = 'Full Message') {
-    const msg = { time: Date.now(), text, type }
+  send(msg: ProgressMessage | CompleteMessage) {
     this.ws.send(msg)
   }
 
   destroy() {
     this.ws.close()
+    this.$subscriptions.forEach((subscription) => { subscription.unsubscribe() })
   }
 }
