@@ -1,20 +1,20 @@
 import React, { useRef, useState, ChangeEvent, useEffect } from 'react'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { useSubscription, useObservable, useObservableState } from 'observable-hooks'
+import { filter, map, tap } from 'rxjs/operators'
+import { useSubscription, useObservable, useObservableCallback, useObservableState } from 'observable-hooks'
 import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
 import { UserRoomService } from 'src/services/user-room'
+import { logger } from 'src/logger'
+
+const log = logger('<UserRoom>')
 
 interface Props {
   service: UserRoomService
 }
 
-const makeId = () => `msg-${Date.now()}-${Math.random().toPrecision(7)}`
-
 export function UserRoom({ service }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
 
-  const [id, setId] = useState<string>(makeId())
   const [ messages, setMessages ] = useState<Message[]>([])
   const [input, onChange] = useObservableState(
     (evt$: Observable<ChangeEvent<HTMLInputElement> | string>) => (

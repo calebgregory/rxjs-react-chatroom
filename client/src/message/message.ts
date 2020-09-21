@@ -1,3 +1,4 @@
+import sha1 from 'sha1'
 import { logger } from 'src/logger'
 
 const log = logger('messages')
@@ -5,19 +6,23 @@ const log = logger('messages')
 export interface JoinedMessage {
   type: 'JOINED',
   user: string,
+  id: string,
   // timestamp: string
 }
 export function makeJoinedMessage(user: string): JoinedMessage {
-  return { user, type: 'JOINED' }
+  const id = sha1(`${user} joined`)
+  return { user, type: 'JOINED', id }
 }
 
 export interface LeftMessage {
   type: 'LEFT',
   user: string,
+  id: string,
   // timestamp: string
 }
 export function makeLeftMessage(user: string): LeftMessage {
-  return { user, type: 'LEFT' }
+  const id = sha1(`${user} left`)
+  return { user, type: 'LEFT', id }
 }
 
 export interface CommMessage {
@@ -26,24 +31,28 @@ export interface CommMessage {
   data: CompleteMessage | ProgressMessage | ErroneousMessage,
   // maybe we got a message incorrectly formatted as something other than JSON:
   msgFailedParse?: boolean,
+  id: string
 }
 export function makeCommMessage(user: string, json: string): CommMessage {
+  const id = sha1(json)
   let data
   try {
     data = JSON.parse(json)
   } catch (error) {
     log.warn("makeJSONMessage - error parsing message JSON", { error })
-    return { user, data: { type: 'ERRONEOUS', text: json }, type: 'COMM', msgFailedParse: true }
+    return { user, data: { type: 'ERRONEOUS', text: json }, type: 'COMM', msgFailedParse: true, id }
   }
-  return { user, data, type: 'COMM' }
+  return { user, data, type: 'COMM', id }
 }
 
 export interface UnknownMessage {
   type: 'UNKNOWN',
-  data: string
+  data: string,
+  id: string
 }
 export function makeUnknownMessage(data: string): UnknownMessage {
-  return { data, type: 'UNKNOWN' }
+  const id = sha1(data)
+  return { data, type: 'UNKNOWN', id }
 }
 
 export type Message = JoinedMessage | LeftMessage | CommMessage | UnknownMessage
@@ -53,7 +62,6 @@ export type Message = JoinedMessage | LeftMessage | CommMessage | UnknownMessage
 
 export interface CompleteMessage {
   type: 'COMPLETE',
-  text: string,
   time: number,
   id: string
 }

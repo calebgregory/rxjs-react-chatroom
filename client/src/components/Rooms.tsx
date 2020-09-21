@@ -10,7 +10,6 @@ export function Rooms(props: Props) {
   const { userRoomManager } = useContext(AppContext)
 
   const userRooms = useObservableState<UserRoomService[]>(userRoomManager.rooms$, [])
-  console.debug({ userRooms })
 
   return <>{userRooms.map((service) => <UserRoom key={service.id} service={service} />)}</>
 }
