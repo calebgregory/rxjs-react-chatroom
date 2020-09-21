@@ -1,9 +1,9 @@
 import { Observable, Subject, Subscription } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { ObservableWebSocket } from '../util/observable-websocket'
-import { Message, ProgressMessage, CompleteMessage } from '../message/message'
-import { parseMessageData } from '../message/parsers/oatpp-ws-messages'
-import { config } from '../config'
+import { ObservableWebSocket } from 'src/util/observable-websocket'
+import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
+import { parseMessageData } from 'src/message/parsers/oatpp-ws-messages'
+import { config } from 'src/config'
 
 export interface UserRoom {
   user: string,

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
 import { useObservableState } from 'observable-hooks'
-import { AppContext } from '../contexts/AppContext'
-import { UserRoom } from './UserRoom'
-import { UserRoomService } from '../services/user-room'
+import { AppContext } from 'src/contexts/AppContext'
+import { UserRoom } from 'src/components/UserRoom'
+import { UserRoomService } from 'src/services/user-room'
 
 interface Props {}
 

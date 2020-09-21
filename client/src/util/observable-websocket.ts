@@ -1,7 +1,7 @@
 import { fromEvent, Observable, Subject, BehaviorSubject } from 'rxjs'
 import { tap, share, map } from 'rxjs/operators'
-import { bufferWhen } from '../observables/operators'
-import { logger } from '../logger'
+import { bufferWhen } from 'src/observables/operators'
+import { logger } from 'src/logger'
 
 const log = logger('services/websocket')
 

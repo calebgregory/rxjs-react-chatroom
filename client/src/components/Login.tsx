@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { AppContext } from '../contexts/AppContext'
+import { AppContext } from 'src/contexts/AppContext'
 
 interface Props {}
 
@@ -12,6 +12,8 @@ export function Login(props: Props) {
     evt.preventDefault() // prevent refresh
     userRoomManager.addRoom({ user: userName, room: roomName })
   }
+
+  const isEnterButtonDisabled = !(roomName && userName)
 
   return (
     <form onSubmit={handleSubmit}>
@@ -27,7 +29,7 @@ export function Login(props: Props) {
         value={roomName}
         onChange={(evt) => setRoomName(evt.target.value)}
       />
-      <button onClick={handleSubmit}>
+      <button onClick={handleSubmit} disabled={isEnterButtonDisabled}>
         Enter Room
       </button>
     </form>

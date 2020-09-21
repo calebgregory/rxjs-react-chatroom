@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs'
-import { UserRoomService, UserRoom, getId } from './user-room'
+import { UserRoomService, UserRoom, getId } from 'src/services/user-room'
 
 export class UserRoomManager {
   userRoomById: Map<string, UserRoomService> = new Map()

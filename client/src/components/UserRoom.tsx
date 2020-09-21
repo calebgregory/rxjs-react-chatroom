@@ -2,8 +2,8 @@ import React, { useRef, useState, ChangeEvent, useEffect } from 'react'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { useSubscription, useObservable, useObservableState } from 'observable-hooks'
-import { Message, ProgressMessage, CompleteMessage } from '../message/message'
-import { UserRoomService } from '../services/user-room'
+import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
+import { UserRoomService } from 'src/services/user-room'
 
 interface Props {
   service: UserRoomService

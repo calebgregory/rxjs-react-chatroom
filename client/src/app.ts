@@ -1,4 +1,4 @@
-import { UserRoomManager } from './services/user-room-manager'
+import { UserRoomManager } from 'src/services/user-room-manager'
 
 export interface App {
   userRoomManager: UserRoomManager,

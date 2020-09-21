@@ -1,7 +1,7 @@
 import React from 'react'
-import { AppProvider } from './contexts/AppContext'
-import { Rooms } from './components/Rooms'
-import { Login } from './components/Login'
+import { AppProvider } from 'src/contexts/AppContext'
+import { Rooms } from 'src/components/Rooms'
+import { Login } from 'src/components/Login'
 
 export function RootComponent() {
   return (

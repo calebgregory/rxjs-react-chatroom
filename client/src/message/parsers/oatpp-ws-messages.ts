@@ -1,4 +1,4 @@
-import { Message, makeJoinedMessage, makeLeftMessage, makeCommMessage, makeUnknownMessage } from '../message'
+import { Message, makeJoinedMessage, makeLeftMessage, makeCommMessage, makeUnknownMessage } from 'src/message/message'
 
 const joinedFormat = /^(.+) joined (.+)$/
 const leftFormat = /^(.+) left the room$/
