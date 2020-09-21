@@ -1,12 +1,9 @@
 import React, { useRef, useState, ChangeEvent, useEffect } from 'react'
 import { Observable } from 'rxjs'
-import { filter, map, tap } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
 import { useSubscription, useObservable, useObservableCallback, useObservableState } from 'observable-hooks'
-import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
+import { Message } from 'src/message/message'
 import { UserRoomService } from 'src/services/user-room'
-import { logger } from 'src/logger'
-
-const log = logger('<UserRoom>')
 
 interface Props {
   service: UserRoomService
@@ -29,26 +26,33 @@ export function UserRoom({ service }: Props) {
 
   const progress$ = useObservable(
     (input$) => input$.pipe(
-      map(([text]) => ({ type: 'PROGRESS', text, time: Date.now(), id, } as ProgressMessage))
+      map(([x]) => x),
+      filter((x) => x.length > 0)
     ),
     [input]
   )
 
-  const handleSubmit = (evt: React.SyntheticEvent) => {
-    evt.preventDefault()
+  const [onSubmit, submit$] = useObservableCallback<React.SyntheticEvent<HTMLFormElement>, React.SyntheticEvent<HTMLFormElement>>(
+    (event$) => event$
+  )
 
-    const msg: CompleteMessage = { type: 'COMPLETE', text: input, time: Date.now(), id }
-    service.send(msg)
-    onChange('')
-    setId(makeId())
-  }
-
+  // @todo: this appending behavior should be done elsewhere
   useSubscription(service.incoming$, (message) => setMessages([...messages, message]))
+
+  // submit events should not refresh the page; cleanup input
+  useSubscription(submit$, (event) => { event.preventDefault(); onChange('') })
+
+  // pipe PROGRESS messages to progressText$ Subject
   useEffect(() => {
-    // pipe PROGRESS messages -> outgoing$ Subject on Service
-    const subscription = progress$.subscribe(service.outgoing$)
+    const subscription = progress$.subscribe(service.userRoomMessages.progressText$)
     return () => { subscription.unsubscribe() }
-  }, [progress$, service.outgoing$])
+  }, [progress$, service.userRoomMessages.progressText$])
+
+  // pipe submit events to completeSignal$ Subject
+  useEffect(() => {
+    const subscription = submit$.pipe(map(() => null)).subscribe(service.userRoomMessages.completeSignal$)
+    return () => { subscription.unsubscribe() }
+  }, [submit$, service.userRoomMessages.completeSignal$])
 
   return (
     <div>
@@ -57,18 +61,21 @@ export function UserRoom({ service }: Props) {
         {messages.map((msg) => {
           switch (msg.type) {
             case 'JOINED':
-              return <li><strong>{msg.user} joined</strong></li>
+              return <li key={msg.id}><strong>{msg.user} joined</strong></li>
             case 'LEFT':
-              return <li><strong>{msg.user} left</strong></li>
+              return <li key={msg.id}><strong>{msg.user} left</strong></li>
             case 'COMM':
-              return <li><strong>{msg.user}</strong>: {msg.data.text}</li>
+              if (msg.data.type === 'COMPLETE') {
+                return <li key={msg.id}><strong>{msg.user}</strong>: <i>EOM</i></li>
+              }
+              return <li key={msg.id}><strong>{msg.user}</strong>: {msg.data.text}</li>
             case 'UNKNOWN':
             default:
-              return <li><i>({msg})</i></li>
+              return <li key={msg.id}><i>({msg})</i></li>
           }
         })}
         <li>
-          <form onSubmit={handleSubmit} ref={formRef}>
+          <form onSubmit={onSubmit} ref={formRef}>
             &gt;
             {' '}
             <input type="text" onChange={onChange} value={input} />
