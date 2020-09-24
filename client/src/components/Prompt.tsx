@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function Prompt({ progressText$, send$ }: Props) {
-  const formRef = useRef<HTMLFormElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const [input, onChange] = useObservableState(
     (evt$: Observable<ChangeEvent<HTMLInputElement> | string>) => (
@@ -49,12 +49,16 @@ export function Prompt({ progressText$, send$ }: Props) {
     return () => { subscription.unsubscribe() }
   }, [submit$, send$])
 
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [inputRef])
+
   return (
     <li>
-      <form onSubmit={onSubmit} ref={formRef}>
+      <form onSubmit={onSubmit}>
         &gt;
         {' '}
-        <input type="text" onChange={onChange} value={input} />
+        <input type="text" ref={inputRef} onChange={onChange} value={input} />
         <span style={{fontSize: 10, marginLeft: '5px'}}><i><code>Enter</code> key sends</i></span>
       </form>
     </li>
