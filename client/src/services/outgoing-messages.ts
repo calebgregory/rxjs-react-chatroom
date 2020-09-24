@@ -1,5 +1,6 @@
-import { Observable, BehaviorSubject, Subject, Subscription } from 'rxjs'
+import { Observable, BehaviorSubject, Subject } from 'rxjs'
 import { map, tap, withLatestFrom } from 'rxjs/operators'
+import { Service } from 'src/util/service'
 import { ProgressMessage, makeProgressMessage, CompleteMessage, makeCompleteMessage } from 'src/message/message'
 import { logger } from 'src/logger'
 
@@ -7,7 +8,7 @@ const log = logger('outgoing-message')
 
 const makeId = () => `msg-${Date.now()}-${Math.random().toPrecision(7)}`
 
-export class OutgoingMessages {
+export class OutgoingMessages extends Service {
   // UserRoom pushes values to these
   progressText$: Subject<string> = new Subject()
   completeSignal$: Subject<null> = new Subject()
@@ -26,20 +27,15 @@ export class OutgoingMessages {
     tap((msg) => log.info('complete message', { msg }))
   )
 
-
-  $subscriptions: Set<Subscription> = new Set()
-
   constructor() {
+    super()
+
     // set new message ID when completeMsg is sent
-    this.$subscriptions.add(
+    this.$(
       this.completeMsg$.pipe(
         map(() => makeId()),
         tap((id) => log.info('made id', { id }))
       ).subscribe(this.id$)
     )
-  }
-
-  destroy = () => {
-    this.$subscriptions.forEach((subscription) => subscription.unsubscribe())
   }
 }

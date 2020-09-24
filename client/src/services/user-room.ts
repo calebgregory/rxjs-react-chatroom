@@ -1,5 +1,6 @@
-import { Observable, Subject, Subscription } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { map, share } from 'rxjs/operators'
+import { Service } from 'src/util/service'
 import { ObservableWebSocket } from 'src/util/observable-websocket'
 import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
 import { parseMessageData } from 'src/message/parsers/oatpp-ws-messages'
@@ -21,19 +22,19 @@ export function fromId(id: string): UserRoom {
   return { user, room }
 }
 
-export class UserRoomService {
+export class UserRoomService extends Service {
   id: string
   user: string
   room: string
   ws: ObservableWebSocket
   incoming$: Observable<Message>
   outgoing$: Subject<ProgressMessage | CompleteMessage> = new Subject()
-  $subscriptions: Set<Subscription> = new Set()
 
   incomingMessages: IncomingMessages
-  outgoingMessages = new OutgoingMessages()
+  outgoingMessages: OutgoingMessages
 
   constructor({ user, room }: UserRoom) {
+    super()
     const url = `${config.wsUrl}/${room}/?nickname=${user}`
 
     this.id = getId({ user, room })
@@ -47,11 +48,12 @@ export class UserRoomService {
       share()
     )
 
-    this.incomingMessages = new IncomingMessages({ incoming$: this.incoming$ })
+    this.incomingMessages = this.supervise(new IncomingMessages({ incoming$: this.incoming$ }))
+    this.outgoingMessages = this.supervise(new OutgoingMessages())
 
-    this.$subscriptions.add(this.outgoingMessages.progressMsg$.subscribe(this.outgoing$))
-    this.$subscriptions.add(this.outgoingMessages.completeMsg$.subscribe(this.outgoing$))
-    this.$subscriptions.add(this.outgoing$.subscribe((msg) => { this.send(msg) }))
+    this.$(this.outgoingMessages.progressMsg$.subscribe(this.outgoing$))
+    this.$(this.outgoingMessages.completeMsg$.subscribe(this.outgoing$))
+    this.$(this.outgoing$.subscribe((msg) => { this.send(msg) }))
   }
 
   send(msg: ProgressMessage | CompleteMessage) {
@@ -59,8 +61,8 @@ export class UserRoomService {
   }
 
   destroy() {
+    super.destroy()
+
     this.ws.close()
-    this.$subscriptions.forEach((subscription) => { subscription.unsubscribe() })
-    this.outgoingMessages.destroy()
   }
 }

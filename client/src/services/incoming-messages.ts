@@ -1,4 +1,5 @@
-import { Observable, Subscription, from, merge } from 'rxjs'
+import { Observable, from, merge } from 'rxjs'
+import { Service } from 'src/util/service'
 import { filter, map, scan, mergeMap, tap } from 'rxjs/operators'
 import { CommMessage, JoinedMessage, LeftMessage, Message } from 'src/message/message'
 
@@ -53,12 +54,12 @@ export function groupByDataId2() {
   }
 }
 
-export class IncomingMessages {
+export class IncomingMessages extends Service {
   messages$: Observable<Message[]>
 
-  $subscriptions: Set<Subscription> = new Set()
-
   constructor({ incoming$ }: Dependencies) {
+    super()
+
     const _joinMessage$: Observable<JoinedMessage> = incoming$.pipe(filterMessageType<JoinedMessage>('JOINED'))
     const _leftMessage$: Observable<LeftMessage> = incoming$.pipe(filterMessageType<LeftMessage>('LEFT'))
 
@@ -73,9 +74,5 @@ export class IncomingMessages {
         scan((acc: Message[], curr: Message) => [...acc, curr], []),
         tap((messages: Message[]) => log.info('messages', { messages }))
       )
-  }
-
-  destroy = () => {
-    this.$subscriptions.forEach((subscription) => subscription.unsubscribe())
   }
 }
