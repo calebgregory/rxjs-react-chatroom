@@ -1,0 +1,1 @@
+export { pluckEventTargetValue } from './pluckEventTargetValue'

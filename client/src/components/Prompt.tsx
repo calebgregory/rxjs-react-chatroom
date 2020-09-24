@@ -1,7 +1,8 @@
-import React, { useRef, ChangeEvent, useEffect } from 'react'
-import { Observable, Observer } from 'rxjs'
+import React, { useRef, useEffect } from 'react'
+import { Observer } from 'rxjs'
 import { map, filter } from 'rxjs/operators'
 import { useObservable, useObservableCallback, useObservableState, useSubscription } from 'observable-hooks'
+import { pluckEventTargetValue } from 'src/observables/helpers'
 
 interface Props {
   progressText$: Observer<string>,
@@ -11,16 +12,7 @@ interface Props {
 export function Prompt({ progressText$, send$ }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [input, onChange] = useObservableState(
-    (evt$: Observable<ChangeEvent<HTMLInputElement> | string>) => (
-      evt$.pipe(
-        map((evt) => typeof evt === 'string' ?
-          evt :
-          (evt.target as HTMLInputElement).value)
-      )
-    ),
-    ''
-  )
+  const [input, onChange] = useObservableState(pluckEventTargetValue(), '')
 
   const progress$ = useObservable(
     (input$) => input$.pipe(
