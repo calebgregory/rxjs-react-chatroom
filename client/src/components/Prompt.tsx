@@ -46,13 +46,15 @@ export function Prompt({ progressText$, send$ }: Props) {
   }, [inputRef])
 
   return (
-    <li>
-      <form onSubmit={onSubmit}>
-        &gt;
-        {' '}
-        <input type="text" ref={inputRef} onChange={onChange} value={input} />
-        <span style={{fontSize: 10, marginLeft: '5px'}}><i><code>Enter</code> key sends</i></span>
-      </form>
-    </li>
+    <ul>
+      <li>
+        <form onSubmit={onSubmit}>
+          &gt;
+          {' '}
+          <input type="text" ref={inputRef} onChange={onChange} value={input} />
+          <span style={{fontSize: 10, marginLeft: '5px'}}><i><code>Enter</code> key sends</i></span>
+        </form>
+      </li>
+    </ul>
   )
 }
