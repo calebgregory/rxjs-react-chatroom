@@ -28,12 +28,12 @@ export function groupByDataId() {
       // because JavaScript Maps preserve insertion order, message-order will be retained
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
     }, new Map<string, Message>()),
-    map((messages: Map<string, Message>) => Array.from(messages.values()))
+    map((messages: Map<string, Message>) => messages.values()),
   )
 }
 
 export class IncomingMessages extends Service {
-  messages$: Observable<Message[]>
+  messages$: Observable<IterableIterator<Message>>
 
   constructor({ incoming$ }: Dependencies) {
     super()

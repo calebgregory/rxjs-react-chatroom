@@ -1,14 +1,20 @@
 import React from 'react'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { useObservableState } from 'observable-hooks'
 import { Message } from 'src/message/message'
 
 interface Props {
-  src$: Observable<Message[]>
+  src$: Observable<IterableIterator<Message>>
 }
 
 export function Messages({ src$ }: Props) {
-  const messages = useObservableState(src$, [])
+  const messages: Message[] = useObservableState(
+    src$.pipe(
+      map((msgIter: IterableIterator<Message>) => Array.from(msgIter))
+    ),
+    []
+  )
 
   return (
     <ul>
