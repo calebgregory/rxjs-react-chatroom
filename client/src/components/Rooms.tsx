@@ -6,7 +6,7 @@ import { UserRoomService } from 'src/services/user-room'
 
 interface Props {}
 
-export function Rooms(props: Props) {
+export function Rooms(_: Props) {
   const { userRoomManager } = useContext(AppContext)
 
   const userRooms = useObservableState<UserRoomService[]>(userRoomManager.rooms$, [])

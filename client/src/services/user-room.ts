@@ -1,10 +1,11 @@
 import { Observable, Subject, Subscription } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, share } from 'rxjs/operators'
 import { ObservableWebSocket } from 'src/util/observable-websocket'
 import { Message, ProgressMessage, CompleteMessage } from 'src/message/message'
 import { parseMessageData } from 'src/message/parsers/oatpp-ws-messages'
 import { config } from 'src/config'
-import { UserRoomMessages } from 'src/services/user-room-message'
+import { OutgoingMessages } from 'src/services/outgoing-messages'
+import { IncomingMessages } from 'src/services/incoming-messages'
 
 export interface UserRoom {
   user: string,
@@ -29,7 +30,8 @@ export class UserRoomService {
   outgoing$: Subject<ProgressMessage | CompleteMessage> = new Subject()
   $subscriptions: Set<Subscription> = new Set()
 
-  userRoomMessages = new UserRoomMessages()
+  incomingMessages: IncomingMessages
+  outgoingMessages = new OutgoingMessages()
 
   constructor({ user, room }: UserRoom) {
     const url = `${config.wsUrl}/${room}/?nickname=${user}`
@@ -41,11 +43,14 @@ export class UserRoomService {
     this.ws = new ObservableWebSocket(url)
 
     this.incoming$ = this.ws.incoming$.pipe(
-      map((event: MessageEvent) => parseMessageData(event.data))
+      map((event: MessageEvent) => parseMessageData(event.data)),
+      share()
     )
 
-    this.$subscriptions.add(this.userRoomMessages.progressMsg$.subscribe(this.outgoing$))
-    this.$subscriptions.add(this.userRoomMessages.completeMsg$.subscribe(this.outgoing$))
+    this.incomingMessages = new IncomingMessages({ incoming$: this.incoming$ })
+
+    this.$subscriptions.add(this.outgoingMessages.progressMsg$.subscribe(this.outgoing$))
+    this.$subscriptions.add(this.outgoingMessages.completeMsg$.subscribe(this.outgoing$))
     this.$subscriptions.add(this.outgoing$.subscribe((msg) => { this.send(msg) }))
   }
 
@@ -56,6 +61,6 @@ export class UserRoomService {
   destroy() {
     this.ws.close()
     this.$subscriptions.forEach((subscription) => { subscription.unsubscribe() })
-    this.userRoomMessages.destroy()
+    this.outgoingMessages.destroy()
   }
 }

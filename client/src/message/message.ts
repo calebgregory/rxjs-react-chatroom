@@ -40,7 +40,7 @@ export function makeCommMessage(user: string, json: string): CommMessage {
     data = JSON.parse(json)
   } catch (error) {
     log.warn("makeJSONMessage - error parsing message JSON", { error })
-    return { user, data: { type: 'ERRONEOUS', text: json }, type: 'COMM', msgFailedParse: true, id }
+    return { user, data: { type: 'ERRONEOUS', text: json, id }, type: 'COMM', msgFailedParse: true, id }
   }
   return { user, data, type: 'COMM', id }
 }
@@ -65,6 +65,9 @@ export interface CompleteMessage {
   time: number,
   id: string
 }
+export function makeCompleteMessage(id: string, time: number = Date.now()) {
+  return { type: 'COMPLETE', id, time } as CompleteMessage
+}
 
 export interface ProgressMessage {
   type: 'PROGRESS',
@@ -72,8 +75,12 @@ export interface ProgressMessage {
   time: number,
   id: string
 }
+export function makeProgressMessage(id: string, text: string, time: number = Date.now()) {
+  return { type: 'PROGRESS', id, text, time } as ProgressMessage
+}
 
 export interface ErroneousMessage {
   type: 'ERRONEOUS',
   text: string,
+  id: string
 }
