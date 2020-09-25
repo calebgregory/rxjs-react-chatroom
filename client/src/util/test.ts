@@ -32,11 +32,11 @@ export function powerset(S: Set<any>): Set<Set<any>> {
     const tailPS = _ps(tail)       // recur rest
     const subsets = [              // combine
       ...tailPS,                   //             the other subsets
-      ...tailPS.map((elem) => [head, ...elem]) // with each of those subsets' elements, combined with the one we picked
-    ] // if you've picked one out of a set, it will not be in the the remaining set's subsets
+      ...tailPS.map((subset) => [head, ...subset]) // with each of those subsets' elements, combined with the one we picked
+    ] // ,-o-o if you've picked one out of a set, it will not be in the the remaining set's subsets
 
     return subsets
   }
-  const matrix = _ps(Array.from(S))
-  return new Set(matrix.map((subset) => new Set(subset)))
+  const subsets: Array<Array<any>> = _ps(Array.from(S))
+  return new Set(subsets.map((subset) => new Set(subset)))
 }
