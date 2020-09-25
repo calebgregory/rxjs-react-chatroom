@@ -1,6 +1,6 @@
 import * as t from '../test'
 
-fdescribe('powerset', () => {
+describe('powerset', () => {
   test.each([
     [new Set([1, 2]), new Set([new Set([1, 2]), new Set([1]), new Set([2]), new Set()])],
     [new Set([1, 2, 3]), new Set([
