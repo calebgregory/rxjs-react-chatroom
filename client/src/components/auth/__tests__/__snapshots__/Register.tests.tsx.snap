@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getQualitiesStyle has color = green when hasQuality = true 1`] = `
+Object {
+  "color": "green",
+  "fontStyle": "bold",
+}
+`;
