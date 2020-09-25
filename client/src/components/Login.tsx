@@ -9,7 +9,7 @@ export function getIsEnterButtonDisabled(roomName: string, userName: string): bo
   return !(roomName && userName)
 }
 
-export function Login(_: Props) {
+export function LoginRoom(_: Props) {
   const { userRoomManager } = useContext(AppContext)
   const [roomName, onRoomNameChange] = useObservableState(pluckEventTargetValue(), '')
   const [userName, onUserNameChange] = useObservableState(pluckEventTargetValue(), '')
