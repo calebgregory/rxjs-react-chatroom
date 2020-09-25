@@ -1,19 +1,19 @@
 import React from 'react'
 import { useObservableState } from 'observable-hooks'
 import { pluckEventTargetValue } from 'src/observables/helpers'
-import { confirmRegistration } from 'src/services/cognito-auth'
+import { authenticateUser } from 'src/services/cognito-auth'
 
 interface Props {}
 
-export function getIsFormValid(confirmationCode: string): boolean {
-  return Boolean(confirmationCode)
+export function getIsFormValid(username: string, password: string): boolean {
+  return Boolean(username && password)
 }
 
-export function ConfirmRegistration(_: Props) {
+export function Login(_: Props) {
   const [username, onUsernameChange] = useObservableState(pluckEventTargetValue(), '')
-  const [confirmationCode, onConfirmationCodeChange] = useObservableState(pluckEventTargetValue(), '')
+  const [password, onPasswordChange] = useObservableState(pluckEventTargetValue(), '')
 
-  const isFormValid = getIsFormValid(confirmationCode)
+  const isFormValid = getIsFormValid(username, password)
 
   const handleSubmit = (evt: React.SyntheticEvent) => {
     evt.preventDefault() // prevent refresh
@@ -21,7 +21,7 @@ export function ConfirmRegistration(_: Props) {
       return
     }
 
-    confirmRegistration(username, confirmationCode)
+    authenticateUser({ username, password })
   }
 
   return (
@@ -38,21 +38,19 @@ export function ConfirmRegistration(_: Props) {
           onChange={onUsernameChange}
         />
         <label>
-          Confirmation Code (this was emailed to you. you may need to
-          look in your spam folder. whenever you find it, copy and paste it
-          here)
+          Password
         </label>
         <br />
         <input
-          type="text"
-          placeholder="804823"
-          value={confirmationCode}
-          onChange={onConfirmationCodeChange}
+          type="password"
+          placeholder="<your password>"
+          value={password}
+          onChange={onPasswordChange}
         />
       </div>
       <div>
         <button onClick={handleSubmit} disabled={!isFormValid}>
-          Confirm Registration
+          Login
         </button>
       </div>
     </form>

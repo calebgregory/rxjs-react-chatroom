@@ -99,7 +99,7 @@ export function authenticateUser({ username, password }: Credentials) {
       onSuccess: (result) => {
         // const accessToken = result.getAccessToken().getJwtToken()
         const credentials: AWS.CognitoIdentityCredentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: config.cognito.userPoolId,
+          IdentityPoolId: config.cognito.identityPoolId,
           Logins: {
             [`cognito-idp.${config.cognito.region}.amazonaws.com/${config.cognito.userPoolId}`]: result.getIdToken().getJwtToken(),
           },
