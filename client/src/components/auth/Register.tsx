@@ -2,6 +2,7 @@ import * as R from 'ramda'
 import React, { CSSProperties } from 'react'
 import { useObservableState } from 'observable-hooks'
 import { pluckEventTargetValue } from 'src/observables/helpers'
+import { signUp } from 'src/services/cognito-auth'
 
 interface Props {}
 
@@ -37,7 +38,7 @@ export function getIsFormValid(validQualities: Set<string>, password: string, co
 }
 
 export function Register(_: Props) {
-  const [userName, onUserNameChange] = useObservableState(pluckEventTargetValue(), '')
+  const [username, onUsernameChange] = useObservableState(pluckEventTargetValue(), '')
   const [email, onEmailChange] = useObservableState(pluckEventTargetValue(), '')
   const [password, onPasswordChange] = useObservableState(pluckEventTargetValue(), '')
   const [confirmPassword, onConfirmPasswordChange] = useObservableState(pluckEventTargetValue(), '')
@@ -51,6 +52,7 @@ export function Register(_: Props) {
       return
     }
 
+    signUp({ username, password, email })
   }
 
   return (
@@ -60,8 +62,8 @@ export function Register(_: Props) {
         <input
           type="text"
           placeholder="username"
-          value={userName}
-          onChange={onUserNameChange}
+          value={username}
+          onChange={onUsernameChange}
         />
       </div>
       <div>
