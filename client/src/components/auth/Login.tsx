@@ -37,6 +37,8 @@ export function Login(_: Props) {
           value={username}
           onChange={onUsernameChange}
         />
+      </div>
+      <div>
         <label>
           Password
         </label>
