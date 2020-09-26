@@ -1,0 +1,10 @@
+* find better name for UserRoom
+* add authentication
+  * JSON webtoken, internally polls for expiration, exposes observable auth$, unauth$
+* add ability to replay completed messages
+  * store message history
+* build storage using serverless
+  * https://github.com/serverless/components
+* use actual websocket server
+  * https://medium.com/swlh/real-time-chat-application-with-aws-websockets-7f06b833f02c
+  * https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/
