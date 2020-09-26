@@ -39,9 +39,8 @@ describe('getIsFormValid', () => {
   test.each([
     [allQualities, 'a', 'a', true],
     [allQualities, 'aa', 'a', false],
-  ].concat(
-    Array.from(strictSubset).map((subset: Set<string>) => [subset, 'a', 'a', false])
-  ))('%p %s %s -> %p', (validQualities, password, confirmPassword, expected) => {
+    ...strictSubset.map((subset: Set<string>) => [subset, 'a', 'a', false])
+  ])('%p %s %s -> %p', (validQualities, password, confirmPassword, expected) => {
     const isValid = c.getIsFormValid(validQualities as Set<string>, password as string, confirmPassword as string)
     expect(isValid).toEqual(expected)
   })
