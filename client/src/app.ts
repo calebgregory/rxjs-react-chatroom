@@ -1,14 +1,18 @@
 import { UserRoomManager } from 'src/services/user-room-manager'
+import { AuthRouter } from 'src/controllers/auth-router'
 
 export interface App {
   userRoomManager: UserRoomManager,
+  authRouter: AuthRouter,
 }
 
 export function init(): App {
   const userRoomManager = new UserRoomManager()
+  const authRouter = new AuthRouter()
 
   const app = {
-    userRoomManager
+    userRoomManager,
+    authRouter,
   }
 
   return app

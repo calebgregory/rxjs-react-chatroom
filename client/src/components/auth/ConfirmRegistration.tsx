@@ -37,6 +37,8 @@ export function ConfirmRegistration(_: Props) {
           value={username}
           onChange={onUsernameChange}
         />
+      </div>
+      <div>
         <label>
           Confirmation Code (this was emailed to you. you may need to
           look in your spam folder. whenever you find it, copy and paste it
