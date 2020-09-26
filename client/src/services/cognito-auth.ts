@@ -1,3 +1,6 @@
+/**
+  @see https://www.npmjs.com/package/amazon-cognito-identity-js
+ */
 import {
   AuthenticationDetails,
   CognitoUserPool,
