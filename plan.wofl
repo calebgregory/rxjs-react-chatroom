@@ -16,6 +16,7 @@
 
 * Elixir websocket server
   * ,-o-o: https://hexdocs.pm/phoenix/channels.html#tying-it-all-together
+  * e.g., https://github.com/t4t5/messengyr
   * Phoenix Framework application
   * Single application with a Supervision Tree of processes
   * process for handling websocket connection with user

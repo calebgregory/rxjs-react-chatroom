@@ -7,7 +7,7 @@ defmodule ChatServerWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_chat_server_key",
-    signing_salt: "wLby2LHC"
+    signing_salt: "Qz6gW1bf"
   ]
 
   socket "/socket", ChatServerWeb.UserSocket,

@@ -10,10 +10,10 @@ use Mix.Config
 # Configures the endpoint
 config :chat_server, ChatServerWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "Ypc/Vep2OBNKkhKBMAd0XbzZxTZkZk6RGKCvoEwPa1orEQ//RwS1xTN6mfXDgEgc",
+  secret_key_base: "x41mVO2B9tlqLJpjQJq+mN1qvnoQrxeDwid6eqwglZyWHIjMHqsk/DOc6QIs8VQ/",
   render_errors: [view: ChatServerWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: ChatServer.PubSub,
-  live_view: [signing_salt: "RlrMgyPl"]
+  live_view: [signing_salt: "6Pl3mdXA"]
 
 # Configures Elixir's Logger
 config :logger, :console,

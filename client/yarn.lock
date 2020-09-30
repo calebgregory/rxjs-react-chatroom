@@ -1578,6 +1578,11 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
+"@types/phoenix@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@types/phoenix/-/phoenix-1.5.0.tgz#588a87fb29e8cfc7d1c346b939a6d624aff17a81"
+  integrity sha512-GeYodP7A7mjK739EWJVCQNfOiQuWWpmzMigQ4i1GbRKuAzs7fTJwi23AW1ulx/rs9XSkW2pbl9vmeHVYY9Y6Jg==
+
 "@types/prop-types@*":
   version "15.7.3"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
@@ -7617,6 +7622,11 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+
+phoenix@^1.5.5:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/phoenix/-/phoenix-1.5.5.tgz#0db2b7fb8c798c594cab91e16995afedd3d2e228"
+  integrity sha512-4QenJ+pEFZvAqA73uFXhkRAWZhGYaV+IN1pAJ3SHamsFkPAYkTnyvFZmU6HxzxnZxDts5gNox/XzzUE6lY9eLg==
 
 picomatch@^2.0.4, picomatch@^2.0.7:
   version "2.2.1"
