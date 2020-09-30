@@ -13,12 +13,6 @@ defmodule ChatServerWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", ChatServerWeb do
-    pipe_through :browser
-
-    get "/", PageController, :index
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", ChatServerWeb do
   #   pipe_through :api
