@@ -1,10 +1,61 @@
 * find better name for UserRoom
-* add authentication
-  * JSON webtoken, internally polls for expiration, exposes observable auth$, unauth$
-* add ability to replay completed messages
+
+* authentication
+  * exposes observable auth$, unauth$
+    * on unauth$, destroys everything
+* add ability to replay Committed messages
   * store message history
-* build storage using serverless
-  * https://github.com/serverless/components
+  * variable replay rate
+* configurable privacy setting ; if you want to not send message progress, you can opt out
 * use actual websocket server
   * https://medium.com/swlh/real-time-chat-application-with-aws-websockets-7f06b833f02c
   * https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/
+* model MessageDraft
+  * Google Docs Change Resolution algorithm
+  * https://medium.com/coinmonks/operational-transformations-as-an-algorithm-for-automatic-conflict-resolution-3bf8920ea447
+
+* Elixir websocket server
+  * ,-o-o: https://hexdocs.pm/phoenix/channels.html#tying-it-all-together
+  * Phoenix Framework application
+  * Single application with a Supervision Tree of processes
+  * process for handling websocket connection with user
+  * process for broadcasting websocket messages to users room
+  * ETL table for cached values
+  * process for writing to cache and DynamoDB
+  * process with user pool, showing who is online
+
+* Distribute Elixir app using Docker, ECS
+  * https://hub.docker.com/_/elixir/
+  * https://dev.to/mpevec9/elixir-releases-and-docker-2o47
+  * alternatives:
+    * https://gigalixir.com/
+    * https://github.com/coryodaniel/k8s
+
+* model
+  * design
+    * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
+    * pdf format: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#best-practices
+  * Room
+    * has Usernames
+  * CommittedMessages
+    * has User
+    * has Room
+    * Versioned, because we want to facilitate changes to CommittedMessages
+      * initial state of Version 1 = state of Version 0
+    * index by ID
+    * Time
+  * MessageChange
+    * store change diffs
+      * Google Docs Change Resolution algorithm
+    * Time
+
+* client
+  * one websocket connection should be sufficient
+    * fan out message by type afterward
+    * use Phoenix lib for Socket, Presence https://hexdocs.pm/phoenix/js/
+  * realtime should be sufficient, for this application at current usage
+    * but we can throttle or debounce messages and batch these sends client-side if needed
+
+* build User storage using serverless, lambda functions
+  * https://github.com/serverless/components
+  * https://aws.amazon.com/getting-started/hands-on/build-serverless-web-app-lambda-apigateway-s3-dynamodb-cognito/module-3/
