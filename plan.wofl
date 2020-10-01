@@ -1,29 +1,36 @@
 * find better name for UserRoom
 
-* authentication
-  * exposes observable auth$, unauth$
-    * on unauth$, destroys everything
-* add ability to replay Committed messages
-  * store message history
-  * variable replay rate
-* configurable privacy setting ; if you want to not send message progress, you can opt out
-* use actual websocket server
-  * https://medium.com/swlh/real-time-chat-application-with-aws-websockets-7f06b833f02c
-  * https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/
-* model MessageDraft
-  * Google Docs Change Resolution algorithm
-  * https://medium.com/coinmonks/operational-transformations-as-an-algorithm-for-automatic-conflict-resolution-3bf8920ea447
+* features
+  * authentication
+    * exposes observable auth$, unauth$
+      * on unauth$, destroys everything
+  * add ability to replay Committed messages
+    * store message history
+    * variable replay rate
+  * configurable privacy setting ; if you want to not send message progress, you can opt out
+  * show MessageChanges
+    * Google Docs Change Resolution algorithm
+    * https://medium.com/coinmonks/operational-transformations-as-an-algorithm-for-automatic-conflict-resolution-3bf8920ea447
+  * admin view, showing activity
+  * errors are first-class citizens
+    * error types, errors as data
+    * errors DynamoDB table?
+    * leverage Sentry for error aggregation?
 
 * Elixir websocket server
   * ,-o-o: https://hexdocs.pm/phoenix/channels.html#tying-it-all-together
   * e.g., https://github.com/t4t5/messengyr
   * Phoenix Framework application
-  * Single application with a Supervision Tree of processes
-  * process for handling websocket connection with user
-  * process for broadcasting websocket messages to users room
-  * ETL table for cached values
-  * process for writing to cache and DynamoDB
-  * process with user pool, showing who is online
+    * Single application with a Supervision Tree of processes
+  * processes
+    * process for handling websocket connection with user
+    * process for broadcasting websocket messages to Room
+    * ETL table for cached CommittedMessages values
+    * process for writing to cache and DynamoDB
+    * process with user pool, showing who is online ("Presence")
+* alternative websocket server:
+  * https://medium.com/swlh/real-time-chat-application-with-aws-websockets-7f06b833f02c
+  * https://aws.amazon.com/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/
 
 * Distribute Elixir app using Docker, ECS
   * https://hub.docker.com/_/elixir/
@@ -33,29 +40,42 @@
     * https://github.com/coryodaniel/k8s
 
 * model
-  * design
-    * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
-    * pdf format: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#best-practices
-  * Room
-    * has Usernames
+  * DynamoDB
+    * design
+        * url: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
+        * pdf format: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/dynamodb-dg.pdf#best-practices (also in resources/)
+    * [elixir sdk](https://hexdocs.pm/aws/AWS.DynamoDB.html)
+  * Room?
+    * has Users
+    * ^ may be obviated by more general entity: CommittedMessages
   * CommittedMessages
-    * has User
+    * PartitionKey = `UserID`
+    * SortingKey = `#{Room}#{MessageID}#{MessageVersion}#{Timestamp}`
     * has Room
-    * Versioned, because we want to facilitate changes to CommittedMessages
+    * Version, because we want to facilitate changes to CommittedMessages
       * initial state of Version 1 = state of Version 0
-    * index by ID
-    * Time
+    * has User (author)
+    * Timestamp
   * MessageChange
+    * `#{CommittedMessage.ID}#{CommittedMessage.Version}`
     * store change diffs
       * Google Docs Change Resolution algorithm
-    * Time
+    * Timestamp
 
 * client
+  * receives various Messages
+    * MessageChange
+    * CommittedMessage
+    * Presence Messages
+      * Joined
+      * Left
   * one websocket connection should be sufficient
     * fan out message by type afterward
-    * use Phoenix lib for Socket, Presence https://hexdocs.pm/phoenix/js/
-  * realtime should be sufficient, for this application at current usage
-    * but we can throttle or debounce messages and batch these sends client-side if needed
+    * use Phoenix lib for Socket, Presence
+      * https://hexdocs.pm/phoenix/js/
+  * sending MessageChanges in realtime should be sufficient, for this application at current usage
+    * but we can debounce MessageChanges and batch these sends client-side, if ever needed
+      * then, when a batch of MessageChanges is received, client would preserve the _timing_ from one Change to the next using `.delay()` and the timestamps on the MessageChanges
 
 * build User storage using serverless, lambda functions
   * https://github.com/serverless/components
