@@ -1,6 +1,8 @@
 import { UserRoomManager } from 'src/services/user-room-manager'
 import { AuthRouter } from 'src/controllers/auth-router'
 
+
+import 'src/services/chat-server-socket'
 export interface App {
   userRoomManager: UserRoomManager,
   authRouter: AuthRouter,
